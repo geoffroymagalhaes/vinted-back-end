@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-app.use(cors());
+
 const cloudinary = require("cloudinary").v2;
 const mongoose = require("mongoose");
 const uid2 = require("uid2");
@@ -10,6 +10,7 @@ const encBase64 = require("crypto-js/enc-base64");
 const isAuthenticated = require("./middlewares/isAuthenticated");
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 mongoose.connect("mongodb://localhost/vinted");
 
