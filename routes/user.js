@@ -3,20 +3,23 @@ const router = express.Router();
 const uid2 = require("uid2");
 const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
-const cloudinary = require("cloudinary").v2;
 const User = require("../models/User");
-const fileUpload = require("express-fileupload");
 
 router.post("/user/signup", async (req, res) => {
   console.log("hello");
   try {
-    const salt = uid2(16);
-    const hash = SHA256(req.body.password + salt).toString(encBase64);
-    const token = uid2(64);
+    if (!req.body.username || !req.body.email || !req.body.password) {
+      return res.status(400).json("Missing parameters");
+    }
     const checkEmail = await User.findOne({ email: req.body.email });
     if (checkEmail) {
       return res.status(400).json("This email is already being used!");
     }
+
+    const salt = uid2(16);
+    const hash = SHA256(req.body.password + salt).toString(encBase64);
+    const token = uid2(64);
+
     const newSignup = new User({
       email: req.body.email,
       account: {
@@ -35,7 +38,9 @@ router.post("/user/signup", async (req, res) => {
       token: newSignup.token,
       account: newSignup.account,
     });
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 });
 
 router.post("/user/logins", async (req, res) => {
@@ -58,7 +63,9 @@ router.post("/user/logins", async (req, res) => {
     } else {
       res.json("it's all wrong mate! try again!");
     }
-  } catch (error) {}
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 });
 
 module.exports = router;

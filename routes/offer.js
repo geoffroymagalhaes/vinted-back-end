@@ -1,17 +1,14 @@
 const express = require("express");
-const router = express.Router();
 const cloudinary = require("cloudinary").v2;
-const User = require("../models/User");
-const Offer = require("../models/Offer");
-const fileUpload = require("express-fileupload");
-const uid2 = require("uid2");
-const SHA256 = require("crypto-js/sha256");
-const encBase64 = require("crypto-js/enc-base64");
-const isAuthenticated = require("../middlewares/isAuthenticated");
 
-const convertToBase64 = (file) => {
-  return `data:${file.mimetype};base64,${file.data.toString("base64")}`;
-};
+const router = express.Router();
+
+const fileUpload = require("express-fileupload");
+
+const isAuthenticated = require("../middlewares/isAuthenticated");
+const convertToBase64 = require("../utils/converToBase64");
+
+const Offer = require("../models/Offer");
 
 router.post(
   "/offer/publish",
