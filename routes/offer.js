@@ -16,7 +16,7 @@ router.post(
   fileUpload(),
   async (req, res) => {
     try {
-      console.log(req.files.picture);
+      // console.log(req.files.picture);
       const convertedFile = convertToBase64(req.files.picture);
       const uploadResult = await cloudinary.uploader.upload(convertedFile, {
         folder: "vinted",
@@ -41,6 +41,14 @@ router.post(
     }
   }
 );
+router.put("/offers/modified/:id", isAuthenticated, async (req, res) => {
+  const offerToModify = await Offer.findById(req.params.id);
+  if (offerToModify === null) {
+    return res
+      .status(401)
+      .json({ message: "The Add You're Looking For Does Not Exist !" });
+  }
+});
 
 router.get("/offers", async (req, res) => {
   try {
@@ -80,8 +88,8 @@ router.get("/offers", async (req, res) => {
       .sort(sort)
       .skip(skip)
       .limit(limit)
-      .populate("owner", "account")
-      .select("product_name product_description");
+      .populate("owner", "account");
+    // .select("product_name product_description");
 
     // console.log(req.query);
     const count = await Offer.countDocuments(filter);
@@ -94,6 +102,7 @@ router.get("/offers", async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 router.get("offers/:id", async (req, res) => {
   try {
     const id = req.params.id;
