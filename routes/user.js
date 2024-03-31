@@ -31,14 +31,13 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
       email: req.body.email,
       account: {
         username: req.body.username,
+        avatar: uploadResult,
         //avatar: Object, // nous verrons plus tard comment uploader une image
       },
       newsletter: req.body.newsletter,
       token: token,
       hash: hash,
       salt: salt,
-
-      avatar: uploadResult,
     });
 
     await newSignup.save();
