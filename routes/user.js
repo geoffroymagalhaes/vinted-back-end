@@ -5,7 +5,10 @@ const SHA256 = require("crypto-js/sha256");
 const encBase64 = require("crypto-js/enc-base64");
 const User = require("../models/User");
 
-router.post("/user/signup", async (req, res) => {
+const fileUpload = require("express-fileupload");
+const convertToBase64 = require("../utils/converToBase64");
+
+router.post("/user/signup", fileUpload(), async (req, res) => {
   console.log("hello");
   try {
     if (!req.body.username || !req.body.email || !req.body.password) {
@@ -15,6 +18,10 @@ router.post("/user/signup", async (req, res) => {
     if (checkEmail) {
       return res.status(400).json("This email is already being used!");
     }
+    const convertedFile = convertToBase64(req.files.avatar);
+    const uploadResult = await cloudinary.uploader.upload(convertedFile, {
+      folder: "vinted/users",
+    });
 
     const salt = uid2(16);
     const hash = SHA256(req.body.password + salt).toString(encBase64);
@@ -30,6 +37,8 @@ router.post("/user/signup", async (req, res) => {
       token: token,
       hash: hash,
       salt: salt,
+
+      avatar: uploadResult,
     });
 
     await newSignup.save();

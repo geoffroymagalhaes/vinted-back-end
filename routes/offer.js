@@ -19,7 +19,7 @@ router.post(
       // console.log(req.files.picture);
       const convertedFile = convertToBase64(req.files.picture);
       const uploadResult = await cloudinary.uploader.upload(convertedFile, {
-        folder: "vinted",
+        folder: "vinted/offers",
       });
       console.log(req.body);
 
@@ -27,7 +27,14 @@ router.post(
         product_name: req.body.marque,
         product_description: req.body.description,
         product_price: req.body.price,
-        product_details: req.body.details,
+        product_details: [
+          { MARQUE: req.body.brand },
+          { TAILLE: req.body.size },
+          { ETAT: req.body.condition },
+          { COULEUR: req.body.color },
+          { EMPLACEMENT: req.body.city },
+          { PAIMENT: req.body.payment },
+        ],
         product_image: uploadResult,
         owner: req.user,
       });
