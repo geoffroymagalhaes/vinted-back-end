@@ -20,10 +20,12 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
     if (checkEmail) {
       return res.status(400).json("This email is already being used!");
     }
-    const convertedFile = convertToBase64(req.files.avatar);
-    const uploadResult = await cloudinary.uploader.upload(convertedFile, {
-      folder: "vinted/users",
-    });
+    if (req.files?.avatar) {
+      const convertedFile = convertToBase64(req.files.avatar);
+      const uploadResult = await cloudinary.uploader.upload(convertedFile, {
+        folder: "vinted/users",
+      });
+    }
 
     const salt = uid2(16);
     const hash = SHA256(req.body.password + salt).toString(encBase64);
