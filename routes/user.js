@@ -20,13 +20,6 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
     if (checkEmail) {
       return res.status(400).json("This email is already being used!");
     }
-    if (req.files) {
-      const convertedFile = convertToBase64(req.files.avatar);
-      const uploadResult = await cloudinary.uploader.upload(convertedFile, {
-        folder: "vinted/users",
-      });
-    }
-
     const salt = uid2(16);
     const hash = SHA256(req.body.password + salt).toString(encBase64);
     const token = uid2(64);
@@ -35,7 +28,7 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
       email: req.body.email,
       account: {
         username: req.body.username,
-        avatar: uploadResult,
+        // avatar: uploadResult,
         //avatar: Object, // nous verrons plus tard comment uploader une image
       },
       newsletter: req.body.newsletter,
@@ -43,6 +36,13 @@ router.post("/user/signup", fileUpload(), async (req, res) => {
       hash: hash,
       salt: salt,
     });
+    if (req.files) {
+      const convertedFile = convertToBase64(req.files.avatar);
+      const uploadResult = await cloudinary.uploader.upload(convertedFile, {
+        folder: "vinted/users",
+      });
+      newSignup.account.avatar = uploadResult;
+    }
 
     await newSignup.save();
     res.json({
