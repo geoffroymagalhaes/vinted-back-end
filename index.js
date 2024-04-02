@@ -4,6 +4,7 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 const cloudinary = require("cloudinary").v2;
+const stripe = require("stripe")(process.env.SECRET_KEY);
 
 app.use(express.json());
 app.use(cors());
@@ -21,6 +22,23 @@ app.use(userRoutes);
 
 const offerRoutes = require("./routes/offer");
 app.use(offerRoutes);
+
+app.post("/payment", async (req, res) => {
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Number((req.body.total * 100).toFixed(0)),
+
+      currency: "eur",
+
+      description: req.body.title,
+    });
+
+    res.json(paymentIntent);
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: error.message });
+  }
+});
 
 app.all("*", (req, res) => {
   res.status(404).json({ message: "This route does not exist" });
